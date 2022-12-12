@@ -10,6 +10,10 @@ type PrintVisitor struct {
 }
 
 func (printVisitor *PrintVisitor) Print(tokens []token.Token) string {
+	if len(tokens) == 0 {
+		return ""
+	}
+
 	printVisitor.sb.Reset()
 
 	for _, tkn := range tokens {

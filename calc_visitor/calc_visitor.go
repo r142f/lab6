@@ -13,12 +13,26 @@ type CalcVisitor struct {
 	stack stack.Stack
 }
 
-func (calcVisitor *CalcVisitor) Calc(tokens []token.Token) (int, error) {
-	var err error
+func (calcVisitor *CalcVisitor) Calc(tokens []token.Token) (result int, err error) {
+	if len(tokens) == 0 {
+		return
+	}
+
+	defer func() {
+		switch p := recover(); p.(type) {
+		case error:
+			err = p.(error)
+		default:
+			if p != nil {
+				panic(p)
+			}
+		}
+	}()
 
 	for _, token := range tokens {
 		token.Accept(calcVisitor)
 	}
+
 	if calcVisitor.stack.Len() != 1 {
 		err = fmt.Errorf("can't calculate: after processing stack length != 1")
 		return 0, err
@@ -34,8 +48,14 @@ func (calcVisitor *CalcVisitor) Visit(tkn token.Token) {
 		calcVisitor.stack.Push(number)
 
 	case token.Operation:
-		b, _ := calcVisitor.stack.Pop().(int)
-		a, _ := calcVisitor.stack.Pop().(int)
+		b, ok := calcVisitor.stack.Pop().(int)
+		if !ok {
+			panic(fmt.Errorf("can't calculate: no operands for operation"))
+		}
+		a, ok := calcVisitor.stack.Pop().(int)
+		if !ok {
+			panic(fmt.Errorf("can't calculate: no operands for operation"))
+		}
 
 		switch tkn {
 		case token.ADD:

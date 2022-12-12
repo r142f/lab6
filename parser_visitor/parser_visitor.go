@@ -14,8 +14,7 @@ type ParserVisitor struct {
 	tokenizer *tokenizer.Tokenizer
 }
 
-func (parserVisitor *ParserVisitor) Parse(input string) ([]token.Token, error) {
-	var err error
+func (parserVisitor *ParserVisitor) Parse(input string) (tokens []token.Token, err error) {
 	defer func() {
 		parserVisitor.tokens = []token.Token{}
 

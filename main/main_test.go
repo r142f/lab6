@@ -43,17 +43,18 @@ func TestCalc(t *testing.T) {
 			continue
 		}
 
-		if got, err := calc.Calc(tokens); got != test.want {
-			if test.calcError && err == nil {
-				t.Errorf("Calc(%q), expected error, got %v", test.input, err)
-			}
-			if !test.calcError && err != nil {
-				t.Errorf("Calc(%q), unexpected error, got %v", test.input, err)
-			}
-			if test.calcError {
-				continue
-			}
+		got, err := calc.Calc(tokens)
+		if test.calcError && err == nil {
+			t.Errorf("Calc(%q), expected error, got %v", test.input, err)
+		}
+		if !test.calcError && err != nil {
+			t.Errorf("Calc(%q), unexpected error, got %v", test.input, err)
+		}
+		if test.calcError {
+			continue
+		}
 
+		if got != test.want {
 			t.Errorf("Calc(%q) = %v", test.input, got)
 		}
 	}
