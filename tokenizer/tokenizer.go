@@ -8,31 +8,31 @@ import (
 
 type Tokenizer struct {
 	Input    string
-	CurChar  string
-	CurPos   int
-	CurToken token.Token
+	curChar  string
+	curPos   int
+	curToken token.Token
 }
 
 func (tokenizer *Tokenizer) Init() {
 	if len(tokenizer.Input) == 0 {
-		tokenizer.CurChar = "$"
+		tokenizer.curChar = "$"
 	} else {
-		tokenizer.CurChar = string(tokenizer.Input[0])
+		tokenizer.curChar = string(tokenizer.Input[0])
 	}
 
-	tokenizer.CurPos++
+	tokenizer.curPos++
 }
 
 func (tokenizer *Tokenizer) nextChar() {
-	if tokenizer.CurPos == len(tokenizer.Input) {
-		tokenizer.CurChar = "$"
-	} else if tokenizer.CurPos > len(tokenizer.Input) {
+	if tokenizer.curPos == len(tokenizer.Input) {
+		tokenizer.curChar = "$"
+	} else if tokenizer.curPos > len(tokenizer.Input) {
 		panic(fmt.Errorf("can't execute nextChar(): end of input is reached"))
 	} else {
-		tokenizer.CurChar = string(tokenizer.Input[tokenizer.CurPos])
+		tokenizer.curChar = string(tokenizer.Input[tokenizer.curPos])
 	}
 
-	tokenizer.CurPos++
+	tokenizer.curPos++
 }
 
 func (tokenizer *Tokenizer) NextToken() (token.Token, error) {
@@ -49,48 +49,48 @@ func (tokenizer *Tokenizer) NextToken() (token.Token, error) {
 	}()
 
 	re := regexp.MustCompile(`\s`)
-	for re.MatchString(tokenizer.CurChar) {
+	for re.MatchString(tokenizer.curChar) {
 		tokenizer.nextChar()
 	}
 
-	switch tokenizer.CurChar {
+	switch tokenizer.curChar {
 	case "0", "1", "2", "3", "4", "5", "6", "7", "8", "9":
 		token := token.NumberToken{Value: ""}
 
 		re := regexp.MustCompile(`\d`)
-		for re.MatchString(tokenizer.CurChar) {
-			token.Value += tokenizer.CurChar
+		for re.MatchString(tokenizer.curChar) {
+			token.Value += tokenizer.curChar
 			tokenizer.nextChar()
 		}
 
-		tokenizer.CurToken = &token
+		tokenizer.curToken = &token
 
 	case "(":
 		tokenizer.nextChar()
-		tokenizer.CurToken = token.LEFT
+		tokenizer.curToken = token.LEFT
 	case ")":
 		tokenizer.nextChar()
-		tokenizer.CurToken = token.RIGHT
+		tokenizer.curToken = token.RIGHT
 
 	case "+":
 		tokenizer.nextChar()
-		tokenizer.CurToken = token.ADD
+		tokenizer.curToken = token.ADD
 	case "-":
 		tokenizer.nextChar()
-		tokenizer.CurToken = token.SUB
+		tokenizer.curToken = token.SUB
 	case "*":
 		tokenizer.nextChar()
-		tokenizer.CurToken = token.MUL
+		tokenizer.curToken = token.MUL
 	case "/":
 		tokenizer.nextChar()
-		tokenizer.CurToken = token.DIV
+		tokenizer.curToken = token.DIV
 
 	case "$":
-		tokenizer.CurToken = token.END
+		tokenizer.curToken = token.END
 
 	default:
-		err = fmt.Errorf("can't execute nextToken(): got illegal character at %v", tokenizer.CurPos)
+		err = fmt.Errorf("can't execute nextToken(): got illegal character at %v", tokenizer.curPos)
 	}
 
-	return tokenizer.CurToken, err
+	return tokenizer.curToken, err
 }
